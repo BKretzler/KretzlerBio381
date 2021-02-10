@@ -1,8 +1,12 @@
 ---
-title: "homepage"
+title: "Homepage"
 author: "Bailey Kretzler"
 date: "2/10/2021"
-output: html_document
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+
 ---
 
 ## This is Bailey's git hub page for Bio 381
