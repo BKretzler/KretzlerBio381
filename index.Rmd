@@ -12,3 +12,11 @@ output:
 ## This is Bailey's git hub page for Bio 381
 
 #### Bailey has swam across the Mississippi River
+
+
+
+### *Homework Assignments*
+
+#### **Week 1**
+
+#### **Week 2** [Homework 2](HW2.html)
