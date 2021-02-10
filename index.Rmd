@@ -1,0 +1,10 @@
+---
+title: "homepage"
+author: "Bailey Kretzler"
+date: "2/10/2021"
+output: html_document
+---
+
+## This is Bailey's git hub page for Bio 381
+
+#### Bailey has swam across the Mississippi River
