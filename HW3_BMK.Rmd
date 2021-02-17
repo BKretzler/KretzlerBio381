@@ -1,0 +1,109 @@
+---
+title: "Homework 3"
+author: "Bailey Kretzler"
+date: "2/17/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+___
+
+
+**1. Remove spaces from table, exchange with comma**
+
+
+Here I use the `\h{2,}` expression to find all the "two or more spaces" except for the line break. I then replace this with `,` 
+
+```
+Find = \h{2,}
+
+Replace = ,
+
+```
+
+___
+
+**2. Rearranging names and putting uni in parentheses**
+
+Here I find and capture^1^ the first word (last name) with `(\w+)` indicating that I want a word of any length. Adding that I would also like to find the comma and spaces (0+) following this. I then find and capture^2^ the second word (first name), again with `(\w+)`. I find the comma between this and the remainder of the phrase and then find and capture^3^ everything else remaining (university name) with `,(.*)`. I replace this with capture^2^, a space, capture^1^, a space, a parentheses (escaping with `\(`), capture^3^, and then a final parentheses.
+
+```
+Find = (\w+),\s*(\w+), (.*)
+
+Replace = \2 \1 \(\3\)
+
+```
+
+___
+
+**3. Organizing mp3 file**
+
+I find and capture the first 4 letters of the line by specifying I want a number (`\d`) that is 4 digits (`{4}`). I then replace this with a line break plus the numbers I captured
+
+```
+Find = (\d{4})
+
+Replace = \n\1
+
+```
+
+___
+
+**4. Rearranging mp3 file name**
+
+Here I use my solution from question 3 as my starting point. I then find and capture^1^ the first 4 digit number with `(\d{4})`. I then find the space of length 0 or more `\s*`. Next I find and capture^2^ everything else up to the .mp3 portion of the phrase with `(.*)`, which allows me to grab the song names with a variable number of words. Last I find and capture^3^ the .mp3 portion of the phrase with `(\.\w+)`. I replace this with capture^2^, then an underscore ,followed by capture^1^ and finally capture^4^.
+
+
+```
+Find = (\d{4})\s*(.*)(\.\w+)
+
+Replace = \2_\1\3
+
+```
+
+___
+
+
+**5. Shortening Genus Name**
+
+I first find and capture^1^ the first letter of the genus name with `(\w)`. Then I find the remainder of the word and the following comma with `\w+,`. Next I find and capture^2^ the entirety of the species name with `(\w+)`. After I find the first number with `,\d+\.\d,`, I have to use 2 number expression in order to find the numbers on both sides of the decimal point. Last I find and capture^3^ the last number with `(\d+)` to indicate that I want a number of any length. I replace this with capture^1^, an underscore, capture^2^, a comma, and capture^3^.
+
+
+```
+Find = (\w)\w+,(\w+),\d+\.\d,(\d+)
+
+Replace = \1_\2,\3
+
+```
+
+___
+
+
+**6. Shortening genus and species name**
+
+I first find and capture^1^ the first letter of the genus name with `(\w)`. Then I find the remainder of the word and the following comma with `\w+,`. Next I find and capture^2^ the first four letter of the species name with `(\w{4})`; the {4} specifies that I only need the first 4 letters. I have to use `\w+` after this to find the remainder of the word. After, I find the first number with `,\d+\.\d,`, I again use 2 number expressions in order to find the numbers on both sides of the decimal point. Last I find and capture^3^ the last number with `(\d+)` to indicate that I want a number of any length. I replace this with capture^1^, an underscore, capture^2^, a comma, and capture^3^.
+
+
+```
+Find = (\w)\w+,(\w{4})\w+,\d+\.\d,(\d+)
+
+Replace = \1_\2,\3
+
+```
+
+___
+
+
+**7. Merging genus and species name**
+
+I first find and capture^1^ the first three letters of the genus name with `(\w{3})`. Then I find the remainder of the word and the following comma with `\w+,`. Next I find and capture^2^ the first three letters of the species name with `(\w{3})`, again following this with `\w+` to indicate I also want to grab the rest of the word. Last I find and capture^3^ the both number with `(,\d+\.\d,\d+)`. I replace this with capture^1^, capture^2^,and capture^3^.
+
+
+```
+Find = (\w{3})\w+,(\w{3})\w+(,\d+\.\d,\d+)
+
+Replace = \1\2\3
+
+```

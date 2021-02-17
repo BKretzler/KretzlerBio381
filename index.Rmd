@@ -19,6 +19,8 @@ output:
 
 ### *Homework Assignments*
 
-#### **Week 1**
+#### **Week 1** No Link
 
 #### **Week 2** [Homework 2](HW2.html)
+
+#### **Week 3** [Homework 3](HW3_BMK.html)
