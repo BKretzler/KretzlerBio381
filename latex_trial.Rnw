@@ -1,0 +1,94 @@
+\documentclass{article}
+
+\begin{document}
+
+
+%Make a comment with percent sign
+
+
+\section*{Main title}
+
+\subsection*{first subtitle}
+
+\subsubsection*{second subtitle}
+
+%remove the asterisk for numbered titles
+\section{Main title}
+
+\subsection{first subtitle}
+
+\subsubsection{second subtitle}
+
+We cannot go below a third level title as above
+
+What will I have for dinner tonight? Most of this follows plain text rules. \LaTeX is amazing
+
+
+here is \textbf{bold face}\\
+here is \textit{italic font}\\
+here is \texttt{plain text}\\
+double back slash indicates a carriage return instead of double space
+
+
+\section*{Quotations}
+
+``use two back ticks to start a quotation, and 2 apostrophes to end''
+
+\section*{lists}
+
+must begin the itemized environment with begin command
+
+\begin{itemize}
+  \item first bullet point
+  \item second
+  \item third
+  
+the end statement
+
+\end{itemize}
+
+or enumerate
+
+\begin{enumerate}
+  \item first bullet point
+  \item second
+  \item third
+  
+the end statement
+
+\end{enumerate}
+
+enumerate generates numbered list, itemized does bullet points. Can do sublayer but Nick doesn't know this.
+
+\section*{Verbatim environment}
+
+\begin{verbatim}
+
+Text here is literal, no formatting signs.
+
+Also no margin control so need carriage returns
+
+\end{verbatim}
+
+
+\section*{Quotation environment}
+
+\begin{quote}
+
+Indents an entire paragraph to display an extended quote. You still have to supply ``quotation marks''
+
+\end{quote}
+
+\section*{R code}
+
+use control alt I to put in a code chunk
+
+within <> can put in echo, and other commands
+
+<<echo = TRUE>>=
+x <- seq(1,10,2)
+y <- seq(1,12,3)
+@
+
+
+\end{document}
