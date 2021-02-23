@@ -83,12 +83,17 @@ Indents an entire paragraph to display an extended quote. You still have to supp
 
 use control alt I to put in a code chunk
 
-within <> can put in echo, and other commands
+within first greater/less than can put in echo, and other commands
 
 <<echo = TRUE>>=
 x <- seq(1,10,2)
 y <- seq(1,12,3)
 @
+
+
+\LaTeX is a lot of work, but you can use templates from the web to input your files https://www.overleaf.com/ \\
+This make \LaTeX amazingly versatile and easier to use IF the templates are well annotated
+
 
 
 \end{document}
