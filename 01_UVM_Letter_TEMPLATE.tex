@@ -1,0 +1,126 @@
+\documentclass[10pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt} % change font size here
+
+%--------------------------------------
+\usepackage{hyphenat} % use to disable hyphenation
+\usepackage[margin=1.0in,top=0.25in]{geometry} % adjust margins
+\usepackage{lipsum} % Just for this example
+
+%--------------------------------------
+% \renewcommand{\familydefault}{\ttdefault} % use for plain text
+\setlength{\parindent}{0pt} % No paragraph indent
+\pagestyle{empty} % No page headers/footers
+\setlength{\parskip}{5mm plus 4mm minus 3mm} % for paragraph spacing
+%--------------------------------------
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\raggedright % toggle off for flush right margin
+\includegraphics[scale=2]{UVMLogoSolid7484.jpg}\\ % delete to remove UVM letterhead
+
+%--------------------------------------
+ \hfill\hfill\hfill % to align following text flush right
+ 24 February 2021\\[10pt]  % <-- ADD DATE HERE
+ 
+%--------------------------------------
+\begin{tabular}{l@{}}
+  Bailey Kretzler \\ 
+  205 Jeffords Hall \\
+  63 Carrigan Dr.\\
+  Burlington, Vermont 05401 \\
+  Phone: +1(636) 866-6688 \\
+  Email: bkretzle@uvm.edu
+\end{tabular}
+
+%--------------------------------------
+\begin{tabular}{@{}l}
+  % date time stamp % use these entries for left flush
+  % \bigskip
+Recipient Name\\
+Address 1\\
+Address 2\\
+Address 3
+\end{tabular}
+%--------------------------------------
+%--------------------------------------
+
+
+Dear Bailey:
+
+
+I hope you have a really great day and you get to do something you love and eat yummy food.
+
+\lipsum[1-2]
+
+
+
+% \newpage % use if necessary to adjust spacing for signature block
+
+%--------------------------------------
+%--------------------------------------
+
+\begin{tabular}{@{}l}
+Sincerely yours,\\
+\includegraphics[scale=0.15,width=2in]{Signature.jpg.png}\\
+Bailey M Kretzler, MSc\\
+PhD Student, Department of Plant and Soil Science\\
+Gund Graduate Fellow
+University of Vermont\\
+Burlington, VT 05405 USA\\
++1 (636)866-6688\\
+bkretzle@uvm.edu\\
+%optionally put your git hub/webpages here
+
+\end{tabular}
+%--------------------------------------
+
+\end{document}
+

@@ -1,0 +1,34 @@
+---
+title: "Homework_4"
+author: "Bailey Kretzler"
+date: "2/24/2021"
+output: html_document
+---
+
+
+
+
+
+<img src="flowchart_CB.jpg" width = "200" height ="200" />
+
+
+
+```{mermaid}
+
+graph LR
+id1((Pasture Plant <br/> Species <br/> Diversity)) --> id3((legume <br/> grass <br/> ratio))
+id3 --> A((N fixing <br/> bacteria))
+
+B((nutrient<br/>cycling gene<br/>expression)) --> c((Soil <br/> Health))
+c --> d((soil <br/> physiochemical <br/> properties))
+d --> e((pasture <br/> management))
+e --> id1
+d --> id1
+id1((Pasture Plant <br/> Species Diversity)) --> id2((Soil <br/> microbial <br/> diversity))
+A --> id2
+id2 --> B
+d--> id2
+
+
+```
+

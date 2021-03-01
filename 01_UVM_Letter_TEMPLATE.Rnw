@@ -1,0 +1,75 @@
+\documentclass[10pt]{article} % change font size here
+
+%--------------------------------------
+\usepackage{hyphenat} % use to disable hyphenation
+\usepackage[margin=1.0in,top=0.25in]{geometry} % adjust margins
+\usepackage{lipsum} % Just for this example
+
+%--------------------------------------
+% \renewcommand{\familydefault}{\ttdefault} % use for plain text
+\setlength{\parindent}{0pt} % No paragraph indent
+\pagestyle{empty} % No page headers/footers
+\setlength{\parskip}{5mm plus 4mm minus 3mm} % for paragraph spacing
+%--------------------------------------
+\begin{document}
+\raggedright % toggle off for flush right margin
+\includegraphics[scale=2]{UVMLogoSolid7484.jpg}\\ % delete to remove UVM letterhead
+
+%--------------------------------------
+ \hfill\hfill\hfill % to align following text flush right
+ 24 February 2021\\[10pt]  % <-- ADD DATE HERE
+ 
+%--------------------------------------
+\begin{tabular}{l@{}}
+  Bailey Kretzler \\ 
+  205 Jeffords Hall \\
+  63 Carrigan Dr.\\
+  Burlington, Vermont 05401 \\
+  Phone: +1(636) 866-6688 \\
+  Email: bkretzle@uvm.edu
+\end{tabular}
+
+%--------------------------------------
+\begin{tabular}{@{}l}
+  % date time stamp % use these entries for left flush
+  % \bigskip
+Recipient Name\\
+Address 1\\
+Address 2\\
+Address 3
+\end{tabular}
+%--------------------------------------
+%--------------------------------------
+
+
+Dear Bailey:
+
+
+I hope you have a really great day and you get to do something you love and eat yummy food.
+
+\lipsum[1-2]
+
+
+
+% \newpage % use if necessary to adjust spacing for signature block
+
+%--------------------------------------
+%--------------------------------------
+
+\begin{tabular}{@{}l}
+Sincerely yours,\\
+\includegraphics[scale=0.15,width=2in]{Signature.jpg.png}\\
+Bailey M Kretzler, MSc\\
+PhD Student, Department of Plant and Soil Science\\
+Gund Graduate Fellow
+University of Vermont\\
+Burlington, VT 05405 USA\\
++1 (636)866-6688\\
+bkretzle@uvm.edu\\
+%optionally put your git hub/webpages here
+
+\end{tabular}
+%--------------------------------------
+
+\end{document}
+
