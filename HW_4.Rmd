@@ -9,7 +9,7 @@ output: html_document
 
 
 
-<img src="flowchart_CB.jpg" width = "500" height ="300" />
+<img src="https://github.com/BKretzler/KretzlerBio381/blob/main/flowchart_CB.jpg?raw=true" width = "500" height ="350" />
 
 
 
