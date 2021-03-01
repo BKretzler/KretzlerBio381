@@ -14,7 +14,7 @@ output:
 #### Bailey has swam across the Mississippi River
 
 
-<img src="Riverswim.png" width = "200" height ="200" />
+<img src="Riverswim.png" width = "500" height ="500" />
 
 
 ### **Homework Assignments**
