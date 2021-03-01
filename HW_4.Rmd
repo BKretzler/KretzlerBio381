@@ -9,7 +9,7 @@ output: html_document
 
 
 
-<img src="flowchart_CB.jpg" width = "200" height ="200" />
+<img src="flowchart_CB.jpg" width = "500" height ="300" />
 
 
 
