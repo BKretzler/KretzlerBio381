@@ -135,7 +135,7 @@ I want to understand how pasture plant species diversity impacts soil microbial 
 
 
 
-<img src="C:\Users\kretz\R\KretzlerBio381\flowchart_CB.jpg" width = "500" height ="400" />
+<img src="flowchart_CB.jpg" width = "500" height ="400" />
 
 
 
