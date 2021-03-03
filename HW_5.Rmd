@@ -1,0 +1,278 @@
+---
+title: "Homework 5"
+author: "Bailey Kretzler"
+date: "3/3/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+1.
+
+**(a)**
+```{r}
+#setting up variables
+x <- 1.1
+a<-2.2
+b <- 3.3
+
+#inputting into formula
+z <- x^(a^b)
+
+print(z)
+
+
+```
+
+
+
+**(b)**
+```{r}
+#setting up variables
+x <- 1.1
+a<-2.2
+b <- 3.3
+
+#inputting into formula
+z <- (x^a)^b
+
+print(z)
+
+
+```
+
+
+
+**(c)**
+```{r}
+# setting up variables
+x <- 1.1
+a<-2.2
+b <- 3.3
+
+#inputting into formula
+z <- (3*(x^3)) +( 2*(x^2)) + 1
+
+print(z)
+
+```
+
+
+
+2.
+
+**(a)**
+```{r}
+
+#using concatenate function to bind two sequences
+#1 to 8 then 7 to 1
+Avec<-c(seq(1,8), seq(7,1))
+
+print(Avec)
+
+```
+
+
+
+**(b)**
+```{r}
+#creating a vector for the number of times to repeat
+#each position in the sequence
+setup <- 1:5
+
+# creating a vector with a sequence from 1 to 5
+# set for each number in the sequence to repeat the 
+#number of time in the set up vector for the 
+#coordingating position
+Bvec <- rep(seq(1,5), times = setup)
+
+print(Bvec)
+
+
+```
+
+
+
+**(c)**
+```{r}
+
+#creating a vector for the number of times to repeat
+setup<- 1:5
+
+#repeating the sequence 5 to 1
+# use the setup vector to indicate the times to repeat
+Cvec <- rep(seq(5,1), times = setup)
+
+print(Cvec)
+
+```
+
+
+
+3.
+
+
+```{r}
+
+#used this to trouble shoot with lauren
+set.seed(75)
+
+#create vector with 2 random uniform numbers
+rand <- runif(2)
+
+#print to check
+print(rand)
+
+#calculate r wit sqrt(x^2 + y^2)
+r <- ((rand[1]^2) + (rand[2]^2))^0.5
+
+#create a input value for atan on y/x
+input <- rand[2]/rand[1]
+
+#calculate theta with atan and input above
+#multiply by 180 divided by pi to convert from radians to degrees
+theta <- (atan(input)) * (180/pi)
+
+#bind into 1 vector of polar coordinates
+polar <- c(r,theta)
+
+#print the polar coordinates vector
+print(polar)
+
+
+
+
+
+```
+
+
+
+4.
+
+
+**(a)**
+```{r}
+#create the queue
+queue <- c("sheep", "fox", "owl", "ant")
+
+#adding the serpent to the end
+#second in concatenate function
+queue <- c(queue, "serpent")
+
+print(queue)
+
+
+```
+
+
+
+**(b)**
+```{r}
+
+#remove the sheep from position 1 since it boarded
+
+queue = queue[-1]
+
+print(queue)
+
+```
+
+
+
+**(c)**
+```{r}
+
+#adding the donkey to the front of the line 
+#begining of the concatenate function
+
+queue = c("donkey",queue)
+
+print(queue)
+
+```
+
+
+
+**(d)**
+```{r}
+#removing the serpent in the fifth positio
+queue = queue[-5]
+
+print(queue)
+
+```
+
+
+
+**(e)**
+```{r}
+
+#remove the owl in the third postion
+queue = queue[-3]
+
+print(queue)
+
+```
+
+
+
+**(f)**
+
+In front of the Ant?
+```{r}
+#add aphid to third position
+queue[3] = "aphid"
+
+#add ant to the end
+queue = c(queue, "ant")
+
+print(queue)
+
+
+```
+
+
+
+**(g)**
+The aphid is third in like
+```{r}
+
+#asking which position the aphid is in
+
+which(queue == "aphid")
+
+
+```
+
+
+
+
+5.
+
+
+```{r}
+# creating a vector from 1 to 100
+hundred<-1:100
+
+# creating a subset of this vector using modular division
+# if a number is perfectly divisible the output of 
+# modular division is zero
+# I ask to remove the instances where this is true
+
+without = hundred[-(which(hundred%%7 ==0 | hundred%%2 ==0 | hundred%%3 ==0))]
+
+#print
+print(without)
+
+#check
+without%%2 == 0
+without%%3 == 0 
+without%%7 ==0
+
+
+
+```
+
+
+

@@ -194,3 +194,24 @@ i = c(4,5,6)
 l = c(5,6,7,8)
 
 i + l #goes back to the first element 
+
+
+############### set seed / subscripting with missing values
+
+set.seed(90)
+z <- runif(10)
+print(z)
+
+
+z < 0.5
+z[z<0.5]
+which(z<0.5)
+z[which(z<0.5)]
+
+####which behave diff w/ NAs
+zd <- c(z,NA,NA)
+zd[zd<0.5] ##carries missing values (NAs)
+which(zd<0.5)
+zd[which(zd<0.5)] ## does not carry NAs
+
+
