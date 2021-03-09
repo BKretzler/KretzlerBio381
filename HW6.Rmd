@@ -1,0 +1,133 @@
+---
+title: "Homework 6"
+author: "Bailey Kretzler"
+date: "3/9/2021"
+output: html_document
+---
+
+
+## **Question 1**
+
+```{r}
+
+#assigning variable n_dims
+
+n_dims <- as.integer(runif(1, min = 3, max = 10))
+print(n_dims)
+
+#create vector of consecutive numbers from 1 to N-dims squarred
+b <- seq(1,(n_dims^2))
+print(b)
+
+#reshuffle with sample function
+b <- sample(b, size = length(b))
+print(b)
+
+#create a square matrix
+m<- matrix(data = b,nrow = n_dims)
+print(m)
+
+#transpose the matrix
+tm <- t(m)
+print(tm)
+  ## this flips the matrix
+  ##rows become columns and columns become rows
+
+#Sum and mean
+#first row
+mean(tm[1,])
+sum(tm[1,])
+
+#last row
+mean(tm[nrow(tm),])
+sum(tm[nrow(tm),])
+
+#use eigen funtion to obtain eigenvector and values
+eigen(tm)
+
+#what are these
+str(eigen(tm)$values)
+str(eigen(tm)$vector)
+
+  ##these are complex numbers
+  ##values are arranged in a vector in descending order
+  ##vectors are arranged by column and correspond to the
+  ##values above (e.g. vector[,5] is associated to value[5])
+  ##it seems like they are a sum of a real and
+  ##imaginary number
+
+#dig in with typeof
+typeof(eigen(tm)$values) #tells us they are complex
+typeof(eigen(tm)$vector) #tells ust they are complex
+
+
+```
+
+
+## **Question 2**
+
+
+
+```{r}
+#initial list
+myList <- list(my_matrix <- matrix(data = runif(16),nrow = 4),my_logical <- round(runif(100, min = 1, max = 10)) == round(runif(100, min = 1, max = 10)), my_letters <- sample(letters[1:26],26))
+
+print(myList)
+
+#list subset
+myList2<- list(myList[[1]][2,2], myList[[2]][2], c <- myList[[3]][2])
+
+print(myList2)
+
+#checking the data types
+typeof(myList2[[1]])#double
+
+typeof(myList2[[2]])#logical
+
+typeof(myList2[[3]])#character
+
+#combining the vector
+combined <- c(myList2[[1]],myList2[[2]],myList2[[3]])
+
+#checking data type
+typeof(combined) #character vector
+
+
+
+```
+
+
+
+## **Question 3**
+
+
+
+```{r}
+#create the dataframe
+my_unis <- runif(26, min = 0, max = 10)
+
+my_letters <- sample(letters[1:26],26)
+
+df <- data.frame(my_unis, my_letters, stringsAsFactors = FALSE)
+
+head(df)
+
+#inputting NAs
+
+df[sample(1:26,4),1] = NA
+
+#determining where they went in the data frame
+which(is.na.data.frame(df[,1]) == TRUE)
+
+
+#sort the letters alphabetically
+
+df[,2] = sort(df[,2])
+head(df)
+
+#column mean for the first col
+
+mean(df[,1], na.rm = TRUE)
+
+
+```

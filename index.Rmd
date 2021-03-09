@@ -41,3 +41,7 @@ No Link
 #### *Week 5*   
 [Homework 5 - Atomic Vectors](HW_5.html)  
 
+
+#### *Week 6*   
+[Homework 5 - Matrices, Lists, and Data Frames](HW6.html)  
+
