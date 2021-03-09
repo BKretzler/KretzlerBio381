@@ -2,7 +2,10 @@
 title: "Homework 6"
 author: "Bailey Kretzler"
 date: "3/9/2021"
-output: html_document
+output:  
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
 ---
 
 
