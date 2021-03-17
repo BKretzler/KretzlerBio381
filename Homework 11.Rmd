@@ -1,0 +1,499 @@
+---
+title: "Homework 7"
+author: "Bailey Kretzler"
+date: "3/17/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+
+---
+
+## Simulated Data
+
+#### Open Libraries
+
+```{r}
+
+library(ggplot2) # for graphics
+library(MASS) # for maximum likelihood estimation
+
+
+```
+
+#### Read in data vector 
+
+
+###### Simulated Data
+
+```{r}
+# quick and dirty, a truncated normal distribution to work on the solution set
+
+z <- rnorm(n=3000,mean=0.2)
+z <- data.frame(1:3000,z)
+names(z) <- list("ID","myVar")
+z <- z[z$myVar>0,]
+str(z)
+summary(z$myVar)
+
+```
+
+
+#### Plot Histogram of data
+
+```{r}
+p1 <- ggplot(data=z, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p1)
+
+```
+
+
+
+#### Add empirical density curve
+
+```{r}
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+
+```
+
+
+
+
+#### Get maximum likelihood parameters
+
+```{r}
+normPars <- fitdistr(z$myVar,"normal")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+```
+
+
+
+#### Plot normal probability density 
+
+```{r}
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+xval <- seq(0,max(z$myVar),len=length(z$myVar))
+
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(z$myVar), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+
+```
+
+
+#### Plot exponential probability density
+
+
+```{r}
+expoPars <- fitdistr(z$myVar,"exponential")
+rateML <- expoPars$estimate["rate"]
+
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(z$myVar), args = list(rate=rateML))
+ p1 + stat + stat2
+
+```
+
+
+
+#### Plot uniform probability density
+
+```{r}
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$myVar), args = list(min=min(z$myVar), max=max(z$myVar)))
+ p1 + stat + stat2 + stat3
+
+```
+
+
+
+#### Plot gamma probability density
+
+```{r}
+gammaPars <- fitdistr(z$myVar,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(z$myVar), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+
+```
+
+
+
+#### Plot beta probability density
+
+```{r}
+pSpecial <- ggplot(data=z, aes(x=myVar/(max(myVar + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+betaPars <- fitdistr(x=z$myVar/max(z$myVar + 0.1),start=list(shape1=1,shape2=2),"beta")
+shape1ML <- betaPars$estimate["shape1"]
+shape2ML <- betaPars$estimate["shape2"]
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(z$myVar), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+
+```
+
+
+
+## My data
+
+
+#### Read in data vector 
+
+
+###### Intercropping data
+
+```{r}
+# loading in some data from an experiment I did in Summer 2020
+
+z <- read.table("Rsheet_IC.csv",header=TRUE,sep=",", stringsAsFactors=FALSE)
+str(z)
+summary(z)
+
+
+```
+
+
+#### Plot Histogram of data
+
+```{r}
+#x = pounds of phosphorus per acre 
+p1 <- ggplot(data=z, aes(x=P_lbA, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p1)
+
+```
+
+
+
+#### Add empirical density curve
+
+```{r}
+
+#add the density curve as a dotted line
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+
+```
+
+
+
+
+#### Get maximum likelihood parameters
+
+```{r}
+#use fitdistr to fit normal distribution parameters to data
+normPars <- fitdistr(z$P_lbA,"normal")
+
+#pring to view what it generated
+print(normPars)
+#view the structure
+str(normPars)
+#extract the mean
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+```
+
+
+
+#### Plot normal probability density 
+
+```{r}
+#create mean and standard deviation values from fitdistr above
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+#creating a vector for x values to use on the graph
+#zero to the max value of phoshorus
+#length is the number of observations
+xval <- seq(0,max(z$P_lbA),len=length(z$P_lbA))
+
+#add a normal shaped line to the graph in red
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(z$P_lbA), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+
+```
+
+
+#### Plot exponential probability density
+
+
+```{r}
+#fitdistr for exponential dis
+expoPars <- fitdistr(z$P_lbA,"exponential")
+#extracting the rate from the estimates generated
+#by fitdistr
+rateML <- expoPars$estimate["rate"]
+
+#add an exponential dist. line to the graph in blue
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(z$P_lbA), args = list(rate=rateML))
+ p1 + stat + stat2
+ 
+#this does not match
+
+```
+
+
+
+#### Plot uniform probability density
+
+```{r}
+
+#create uniform probability using data min and max in dark green
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$P_lbA), args = list(min=min(z$P_lbA), max=max(z$P_lbA)))
+ p1 + stat + stat2 + stat3
+
+```
+
+
+
+#### Plot gamma probability density
+
+```{r}
+#fitdistr for gamma distribution
+gammaPars <- fitdistr(z$P_lbA,"gamma")
+#extract shape parameter
+shapeML <- gammaPars$estimate["shape"]
+#extract rate parameter
+rateML <- gammaPars$estimate["rate"]
+
+#add a line for gamma distribution to the plot in brown
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(z$P_lbA), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+
+```
+
+
+
+#### Plot beta probability density
+
+```{r}
+
+#creating a special graph?
+#x is proportional to max value of x plus 0.1
+pSpecial <- ggplot(data=z, aes(x=P_lbA/(max(P_lbA + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+#fitdistr for beta 
+betaPars <- fitdistr(x=z$P_lbA/max(z$P_lbA + 0.1),start=list(shape1=1,shape2=2),"beta")
+#extract shape1
+shape1ML <- betaPars$estimate["shape1"]
+#extract shape 2
+shape2ML <- betaPars$estimate["shape2"]
+
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(z$P_lbA), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+
+```
+
+
+## Simulated data from my own data
+
+
+
+#### Simulated data
+
+```{r}
+#gamma is best fitting although 
+gammaSim <- fitdistr(z$P_lbA,"gamma")
+
+#extract mean and sd
+shapeSim <- gammaSim$estimate["shape"]
+rateSim <- gammaSim$estimate["rate"]
+
+#generate random values
+simSim <- rgamma(n = length(z$P_lbA), shape = shapeSim, rate = rateSim)
+str(simSim)
+
+#plot values as histogram
+p1 <- ggplot(data=z, aes(x=simSim, y=..density..)) +
+  geom_histogram(color="black",fill="thistle4",size=0.2) + theme_bw() +xlim (0,325)
+print(p1)
+
+
+#add the density curve as a dotted line
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+
+
+```
+
+
+
+#### Actual data
+
+
+```{r}
+#x = pounds of phosphorus per acre 
+p1 <- ggplot(data=z, aes(x=P_lbA, y=..density..)) +
+  geom_histogram(color="black",fill="salmon4",size=0.2) + xlim(0,325) +theme_bw()
+print(p1)
+
+```
+
+
+
+## Questions:
+
+## 1.
+**How do the two histogram profiles compare? Do you think the model is doing a good job of simulating realistic data that match your original measurements? Why or why not?**
+
+The simulated histogram seems to be more spread out, whereas the real one is clustered more around the mean. It has done an ok job of simulating but there are a lot of holes in the graph. I think if there was a greater number of values it might look better.
+        
+## 2. 
+
+
+**If you have entered a large data frame with many columns, try running all of the code on a different variable to see how the simulation performs.**
+
+
+#### Plot Histogram of data
+
+```{r}
+#x = buckwheat density 
+
+p1 <- ggplot(data=z, aes(x=BW_density, y=..density..)) +
+  geom_histogram(color="black",fill="turquoise4",size=0.2) + 
+  theme_bw()
+print(p1)
+
+```
+
+
+
+#### Add empirical density curve
+
+```{r}
+
+#add the density curve as a dotted line
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+
+```
+
+
+
+
+#### Get maximum likelihood parameters
+
+```{r}
+#use fitdistr to fit normal distribution parameters to data
+normPars <- fitdistr(z$BW_density,"normal")
+
+#pring to view what it generated
+print(normPars)
+#view the structure
+str(normPars)
+#extract the mean
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+```
+
+
+
+#### Plot normal probability density 
+
+```{r}
+#create mean and standard deviation values from fitdistr above
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+#creating a vector for x values to use on the graph
+#zero to the max value of phoshorus
+#length is the number of observations
+xval <- seq(0,max(z$BW_density),len=length(z$BW_density))
+
+#add a normal shaped line to the graph in red
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(z$BW_density), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+
+```
+
+
+#### Plot exponential probability density
+
+
+```{r}
+#fitdistr for exponential dis
+expoPars <- fitdistr(z$BW_density,"exponential")
+#extracting the rate from the estimates generated
+#by fitdistr
+rateML <- expoPars$estimate["rate"]
+
+#add an exponential dist. line to the graph in blue
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(z$BW_density), args = list(rate=rateML))
+ p1 + stat + stat2
+ 
+#this does not match
+
+```
+
+
+
+#### Plot uniform probability density
+
+```{r}
+
+#create uniform probability using data min and max in dark green
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$BW_density), args = list(min=min(z$P_lbA), max=max(z$BW_density)))
+ p1 + stat + stat2 + stat3
+
+```
+
+
+
+#### Plot gamma probability density
+
+```{r}
+#fitdistr for gamma distribution
+gammaPars <- fitdistr(z$BW_density,"gamma")
+#extract shape parameter
+shapeML <- gammaPars$estimate["shape"]
+#extract rate parameter
+rateML <- gammaPars$estimate["rate"]
+
+#add a line for gamma distribution to the plot in brown
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(z$BW_density), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+
+```
+
+
+
+#### Plot beta probability density
+
+```{r}
+
+#creating a special graph?
+#x is proportional to max value of x plus 0.1
+pSpecial <- ggplot(data=z, aes(x=BW_density/(max(BW_density + 0.1)), y=..density..)) +
+  geom_histogram(color="black",fill="turquoise4",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted") + theme_bw()
+
+#fitdistr for beta 
+betaPars <- fitdistr(x=z$BW_density/max(z$BW_density + 0.1),start=list(shape1=1,shape2=2),"beta")
+#extract shape1
+shape1ML <- betaPars$estimate["shape1"]
+#extract shape 2
+shape2ML <- betaPars$estimate["shape2"]
+
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(z$BW_density), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+
+```
+
+
+For this variable, the gamma distribution looks to be the best fit.

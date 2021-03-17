@@ -43,5 +43,9 @@ No Link
 
 
 #### *Week 6*   
-[Homework 5 - Matrices, Lists, and Data Frames](HW6.html)  
+[Homework 6 - Matrices, Lists, and Data Frames](HW6.html) 
+
+
+#### *Week 7*   
+[Homework 7 - Distributions and Simulation](Homework-11.html)  
 

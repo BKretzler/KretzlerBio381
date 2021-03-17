@@ -92,3 +92,7 @@ print(unrolled)
 
 round(runif(100, min = 1, max = 10)) == round(runif(100, min = 1, max = 10))
 
+
+## to add a row to a data frame it has to be a list!!!
+
+
