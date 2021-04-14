@@ -20,15 +20,21 @@ library(MASS)
 #lambda = average rate of the event
 #--------------
 #"d" function for prob density
-hits<- 0:10
-my_vec <- dpois(x = hits, lambda = 1)
+hits<- 0:30
+my_vec <- dpois(x = hits, lambda = 5)
 qplot(x=hits,
       y=my_vec,
       geom="col",
       color=I("black"),
-      fill=I("goldenrod"))
+      fill=I("salmon3"))
   #if rate is 1 per time then  (lambda = 1) then it is unlikely to see "hits" at high values
   #tells us prob of obtaining certain values
+
+ggplot() + 
+  geom_col(aes(x = hits, y = my_vec ), fill = "salmon3", col = "black") + 
+  theme_bw() + 
+  xlab ("Number of Occurence per Time Unit") + 
+  ylab("Proportion observed")
 
 
 hits<- 0:10

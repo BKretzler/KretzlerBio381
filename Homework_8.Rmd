@@ -1,0 +1,353 @@
+---
+title: "Homework_8"
+author: "Bailey Kretzler"
+date: "3/31/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+## Introduction
+ 
+ 
+I am going to base this exercise on an experiment I am currently running in which I am examining the response of multiple wild *Phaseolus vulgaris* (common bean) accessions to low water availability. Each of the accessions is selected from areas with contrasting average annual rainfall. I hypothesize that those individuals from areas with low average annual rainfall will have greater drought resilience which will be reflected in the response of root length, root angle, nodule number, and water use efficiency (biomass produced per water consumed) to low water availability. Specifically, those individuals from areas with low average annual rain fall will have increased root length, reduced root angle, increased nodule number, and higher water use efficiency. 
+
+
+
+## Data Simulation
+
+
+I will begin by generating a random data set. For the data set I will use 4 accessions from each rainfall classification in the Jalisco or Durango centers of origin for common bean. I have collected data on this previously and know there is enough in each classification. I will replicate each of these 4 times in a greenhouse experiment and exposed them to low water availability (~ 20% of pot drain capacity). 
+
+```{r}
+
+#---------------------------------------------------------#
+#                      creating the data fram
+#---------------------------------------------------------#
+
+df1=data.frame(
+	rainfall = rep(c("high","low"), each= 16), #rainfall @origin
+	accession = paste("PI",rep(1:8, each = 4), sep = "_"), #accession number
+	BioRep=rep(1:4,times=8), #biological replicate of genotype
+	rootLen = 0, #root length
+	nodNum = 0, #nodule number
+	wue = 0, #water use efficiency
+  rootAng = 0 #root branching 
+	)
+
+print(df1)
+
+
+
+#---------------------------------------------------------#
+#                      water use efficiency
+#---------------------------------------------------------#
+
+## for high average annual rainfall under water limitation
+
+df1[1:16,"wue"] = rnorm(n = nrow(df1)/2,mean = 0.0125 ,sd = 0.005)
+    # accessions with high average annual rainfall
+    # will have low water use efficiency 
+    # numbers are based on my own exps
+
+## for low average annual rainfall under water limitation
+
+df1[17:32,"wue"] = rnorm(n = nrow(df1)/2,mean =0.0375 ,sd = 0.005)
+    # accessions with low average annual rainfall
+    # will have high water use efficiency 
+    # numbers are based on my own exps
+
+head(df1) #checking to be sure it works
+
+
+#---------------------------------------------------------#
+#                      nodule number
+#---------------------------------------------------------#
+
+## for high average annual rainfall under water limitation
+
+df1[1:16,"nodNum"] = rnorm(n = nrow(df1)/2,mean = 50 ,sd = 10)
+    # accessions with high average annual rainfall
+    # will have low nodule number 
+    # numbers are based on my own exps
+
+## for low average annual rainfall under water limitation
+
+df1[17:32,"nodNum"] = rnorm(n = nrow(df1)/2,mean =80 ,sd = 10)
+    # accessions with low average annual rainfall
+    # will have high nodule number
+    # numbers are based on my own exps
+
+#---------------------------------------------------------#
+#                      root length
+#---------------------------------------------------------#
+
+## for high average annual rainfall under water limitation
+
+df1[1:16,"rootLen"] = rnorm(n = nrow(df1)/2,mean = 3000 ,sd = 300)
+    # accessions with high average annual rainfall
+    # will have shallower roots
+    # numbers are based on my own exps
+    # whinrhizo measured total root length in cm
+
+## for low average annual rainfall under water limitation
+
+df1[17:32,"rootLen"] = rnorm(n = nrow(df1)/2,mean =6000 ,sd = 500)
+    # accessions with low average annual rainfall
+    # will have deeper roots
+    # numbers are based on my own exps
+    # whinrhizo measured total root length in cm
+
+#---------------------------------------------------------#
+#                      root angle
+#---------------------------------------------------------#
+
+## for high average annual rainfall under water limitation
+
+df1[1:16,"rootAng"] = rnorm(n = nrow(df1)/2,mean = 60 ,sd = 5)
+    # accessions with high average annual rainfall
+    # will have higher root angle
+    # numbers are based on my own exps
+    # root angle is relative to the primary root
+
+## for low average annual rainfall under water limitation
+
+df1[17:32,"rootAng"] = rnorm(n = nrow(df1)/2,mean =25 ,sd = 5)
+    # accessions with low average annual rainfall
+    # will have lower root angle 
+    # numbers are based on my own exps
+    # root angle is relative to the primary root
+
+
+head(df1)
+tail(df1)
+
+```
+
+
+## Data Analysis
+
+
+Next we need to analyze the data. For this we want to test if there is a significant impact of rainfall at origin on the response variables. Rainfall at origin is categorical here (althought it could be continuous) and we will use a series of ANOVAs. Further we want to test the relationship between water use efficiency and root length and angle to see if root architecture is having an impact on drought resilience. These are both categorical variables and will require us to use a linear regression analysis.
+
+
+```{r}
+
+#---------------------------------------------------------#
+#                      ANOVAS
+#---------------------------------------------------------#
+
+##Water use efficiency
+
+summary(aov(data = df1, wue~rainfall))
+    # the summary of the anova indicates a significant impact 
+    #of rainfall on wue
+
+##Nodule number
+
+summary(aov(data = df1, nodNum~rainfall))
+    # the summary of the anova indicates a significant impact 
+    #of rainfall on nodule number
+
+##Root Length
+
+summary(aov(data = df1, rootLen~rainfall))
+    # the summary of the anova indicates a significant impact 
+    #of rainfall on root length
+
+
+## root angle
+
+sum <-summary(aov(data = df1, rootAng~rainfall))
+    # the summary of the anova indicates a significant impact 
+    #of rainfall on root angle
+
+
+#---------------------------------------------------------#
+#                      regressions
+#---------------------------------------------------------#
+
+
+## wue x root length
+
+sum2<-summary(lm(data = df1, wue~rootLen))
+    #the summary of the linear regression indicates a significant
+    #relationship between water use efficiency and root length
+
+
+
+## wue x root angle
+
+summary(lm(data = df1, wue~rootAng))
+    #the summary of the linear regression indicates a significant
+    #relationship between water use efficiency and root angle
+
+## wue x root length + root angle
+
+summary(lm(data = df1, wue~rootLen+rootAng))
+    #the summary of the linear regression indicates a significant
+    #relationship between water use efficiency and root length 
+    #and angle
+
+summary(lm(data = df1, wue~rootLen*rootAng))
+    #however root length does not interact with root angle
+
+
+```
+
+
+## Plotting the Data
+
+
+When we run the above multiple times we generally get significant values. However, the additive model occassionally renders one of the values insignificant and the interaction model is rarely significant. Lets make some graphs to see this. We will use a boxplot for the ANOVAs and a scatter and line for the linear regression.
+
+
+
+```{r}
+
+require(ggplot2)
+
+#---------------------------------------------------------#
+#                      boxplots
+#---------------------------------------------------------#
+
+##WUE
+
+ggplot(df1) + 
+  geom_boxplot(aes(x = rainfall, y = wue), colour = "black", fill = "salmon3") + 
+  theme_bw() + 
+  ggtitle("Impact of Average Annual Rainfall on \nWater Use Efficiency") + 
+  ylab("Water Use Efficiency (g/g)") + 
+  xlab("Rainfall Classification")
+  
+
+##Root length
+
+ggplot(df1) + 
+  geom_boxplot(aes(x = rainfall, y = rootLen), colour = "black", fill = "salmon3") + 
+  theme_bw() + 
+  ggtitle("Impact of Average Annual Rainfall on Root Length") + 
+  ylab("Root Length (cm)") + 
+  xlab("Rainfall Classification")
+
+
+##Nodule Number
+
+ggplot(df1) + 
+  geom_boxplot(aes(x = rainfall, y = nodNum), colour = "black", fill = "salmon3") + 
+  theme_bw() + 
+  ggtitle("Impact of Average Annual Rainfall on Nodule Number") + 
+  ylab("Nodule Number") + 
+  xlab("Rainfall Classification")
+
+
+##Root Angle
+
+ggplot(df1) + 
+  geom_boxplot(aes(x = rainfall, y = nodNum), colour = "black", fill = "salmon3") + 
+  theme_bw() + 
+  ggtitle("Impact of Average Annual Rainfall on Root Angle") + 
+  ylab("Root Angle (degrees)") + 
+  xlab("Rainfall Classification")
+
+#---------------------------------------------------------#
+#                      scatter and line
+#---------------------------------------------------------#
+
+## WUE x ROOT LENGTH
+
+ggplot(df1) + 
+  geom_point(aes(x = rootLen, y = wue, col = rainfall)) + 
+  geom_smooth(aes(x = rootLen, y = wue),
+              se = FALSE, 
+              col = "black",
+              method = lm) +
+  theme_bw()+ 
+  ggtitle("Impact of Root Length on Water Use Efficiency") + 
+  ylab("Water Use Efficiency (g/g)") + 
+  xlab("Root Length (cm)")
+
+
+## WUE x ROOT ANGLE
+
+ggplot(df1) + 
+  geom_point(aes(x = rootAng, y = wue, col = rainfall)) + 
+  geom_smooth(aes(x = rootAng, y = wue),
+              se = FALSE, 
+              col = "black", 
+              method = lm) +
+  theme_bw()+ 
+  ggtitle("Impact of Root Angle on Water Use Efficiency") + 
+  ylab("Water Use Efficiency (g/g)") + 
+  xlab("Root Angle (cm)")
+
+  
+
+```
+
+
+## Adjusting the mean and standard deviation
+
+Now I will change the predicted mean of WUE to see how this changes the outcome.I will trial 4 different means including the original to see how this changes things. Then I will use the closest means and change the standard deviation.
+
+
+```{r}
+
+dfWUE <- data.frame(rainfall = rep(c("high","low"), each= 16), #rainfall @origin
+                    accession = paste("PI",rep(1:8, each = 4), sep = "_"), #accession number
+                    BioRep=rep(1:4,times=8), #biological replicate of genotype
+                    wue = 0 #WUE
+                    )
+
+  
+#round 1 - original  
+  dfWUE[1:16,"wue"] = rnorm(n = nrow(dfWUE)/2,mean = 0.0125 ,sd = 0.005)
+  dfWUE[17:32,"wue"] = rnorm(n = nrow(dfWUE)/2,mean =0.0375 ,sd = 0.005)
+  
+  summary(aov(data = dfWUE, wue~rainfall)) #significant
+  
+  #round 2  
+  dfWUE[1:16,"wue"] = rnorm(n = nrow(dfWUE)/2,mean = 0.0225 ,sd = 0.005)
+  dfWUE[17:32,"wue"] = rnorm(n = nrow(dfWUE)/2,mean =0.0375 ,sd = 0.005)
+  
+  summary(aov(data = dfWUE, wue~rainfall)) #significant
+  
+  #round 3  
+  dfWUE[1:16,"wue"] = rnorm(n = nrow(dfWUE)/2,mean = 0.0125 ,sd = 0.005)
+  dfWUE[17:32,"wue"] = rnorm(n = nrow(dfWUE)/2,mean =0.0275 ,sd = 0.005)
+  
+  summary(aov(data = dfWUE, wue~rainfall)) #significant
+  
+  #round 4  
+  dfWUE[1:16,"wue"] = rnorm(n = nrow(dfWUE)/2,mean = 0.0225 ,sd = 0.005)
+  dfWUE[17:32,"wue"] = rnorm(n = nrow(dfWUE)/2,mean =0.0275 ,sd = 0.005)
+
+  summary(aov(data = dfWUE, wue~rainfall)) #significant
+  
+  #round 5 - different SD
+  dfWUE[1:16,"wue"] = rnorm(n = nrow(dfWUE)/2,mean = 0.0225 ,sd = 0.01)
+  dfWUE[17:32,"wue"] = rnorm(n = nrow(dfWUE)/2,mean =0.0275 ,sd = 0.01)
+  
+   #round 6 - different SD
+  dfWUE[1:16,"wue"] = rnorm(n = nrow(dfWUE)/2,mean = 0.0225 ,sd = 0.0075)
+  dfWUE[17:32,"wue"] = rnorm(n = nrow(dfWUE)/2,mean =0.0275 ,sd = 0.0075)
+  
+  
+  summary(aov(data = dfWUE, wue~rainfall)) #significant
+  
+  
+  
+
+
+
+
+
+
+```
+
+
+It is clear that as the mean values get closer, the p value tends to shrink. However changing the standard deviation is more imapctful. When used on the closest means it makes the difference between the two groups insignificant. 
+
+
+

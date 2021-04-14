@@ -1,0 +1,12 @@
+###########################################
+# FUNCTION: FunctionName
+# one line description
+# input: x
+# output: x
+#------------------------------------------
+
+FunctionName <- function(){
+
+
+return("testing....FunctionName")
+}

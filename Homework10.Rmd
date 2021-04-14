@@ -1,0 +1,301 @@
+---
+title: "Homework 10"
+author: "Bailey Kretzler"
+date: "4/14/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+## Question 1:
+
+```{r}
+
+#----------------------------------------------------------
+#FUNCTION: counter
+#Description: A function that counts the number of zeros in a vector
+#Inputs: a numeric vector
+#Outputs: the number of zeros
+#----------------------------------------------------------
+counter <- function(x = 0:12) {
+  
+  count = 0
+  
+  for( i in seq_along(x)){
+    if(x[i] == 0){
+      count = count +1
+    }
+  }
+
+  #function body
+  
+  return(count)
+  
+} #end of counter
+#----------------------------------------------------------
+
+counter()
+
+testVec <- c(0:3, -1:1, -5:8)
+
+counter(x = testVec)
+
+```
+
+
+
+## Question 2:
+
+```{r}
+testVec <- c(0:3, -1:1, -5:8)
+
+
+length(which(testVec == 0))
+
+
+
+```
+
+## Question 3:
+
+
+```{r}
+
+#----------------------------------------------------------
+#FUNCTION: matmulti
+#Description: creating a matrix and filling it with the row # * col #
+#Inputs: Matrix dimensions
+#Outputs: a filled matrix
+#----------------------------------------------------------
+matmulti <- function(r = 3, c = 3) {
+
+  mat <- matrix(data = 0, nrow = r, ncol = c)
+  for( i in 1:r){
+    for(j in 1:c){
+      mat[i,j] = i*j
+    }
+  }
+  
+  return(mat)
+  
+} #end of matmulti
+#----------------------------------------------------------
+
+matmulti()
+
+
+```
+
+
+
+
+## Question 4:
+
+
+```{r}
+#---------------------------------------------------------#
+#                      prelims
+#---------------------------------------------------------#
+
+library(ggplot2)
+library(TeachingDemos)
+library(agricolae)
+
+
+
+char2seed("croissant with almonds")
+
+
+
+#---------------------------------------------------------#
+#                      building functions
+#---------------------------------------------------------#
+
+
+#----------------------------------------------------------
+#FUNCTION: readDat
+#Description: Read in or generate data set 
+#Inputs: file name or nothing (as here)
+#Outputs: 3 column data fram of observed data
+#----------------------------------------------------------
+readDat <- function(z = NULL) {
+  if(is.null((z))){
+      xVal <- 1:20
+      yVal <- xVal +10*rnorm(20)
+      df <- data.frame(ID = seq_along(xVal),
+                       x = xVal,
+                       y = yVal)
+  } else
+  
+  df <- read.table( file = z,
+                    header = TRUE,
+                    stringsAsFactors = FALSE,
+                    sep = ",") # add seperator to indicate that this is comma seperated file
+  
+  return(df)
+  
+} #end of readDat
+#----------------------------------------------------------
+
+#readDat()
+
+
+#----------------------------------------------------------
+#FUNCTION: getMet
+#Description: calculate metric for randomization test
+#Inputs: 2 column data frame for regression, column ID for parameters to analyze
+#Outputs: regression slope
+#----------------------------------------------------------
+getMet <- function(z = NULL, P1 = 3, P2 = 2) {
+  if(is.null(z)){
+        xVal <- c(rep("control",10), rep("treatment",10))
+        yVal <- rnorm(20) +10*rnorm(20)
+        z <- data.frame(ID = seq_along(xVal),
+                          x = xVal,
+                          y = yVal)
+        
+  } 
+    
+  . <- aov(z[,P1]~z[,P2]) # use anova to get p
+  . <- summary(.)
+  met <- .[[1]][1,5] #set metric = to the p
+  
+ 
+  
+  return(met)
+  
+} #end of getMet
+#----------------------------------------------------------
+
+#a =summary(aov(df$Gs ~df$Water))
+
+#getMet()
+
+
+#----------------------------------------------------------
+#FUNCTION: shuffleDat
+#Description: randomize data for a regression
+#Inputs: 3 column data frame (ID, x, y)
+#Outputs: 3 column data frame (ID, x, y) - reshuffled
+#----------------------------------------------------------
+shuffleDat <- function(z = NULL, P1 = 3, P2 = 2) {
+            if(is.null(z)){
+                  xVal <- c(rep("control",10), rep("treatment",10)) # change x to a categorical
+                  yVal <- rnorm(20) +10*rnorm(20)
+                  z <- data.frame(ID = seq_along(xVal),
+                                  x = xVal,
+                                  y = yVal)} 
+  
+    z[,P1] <- sample(z[,P1]) # change to reshuffle specified column
+ 
+  
+  return(z)
+  
+} #end of shuffleDat
+#----------------------------------------------------------
+
+#shuffleDat()
+
+#----------------------------------------------------------
+#FUNCTION: getP
+#Description: obtain p value from simulation
+#Inputs: list of observed metric and vector of simulated metrics
+#Outputs: upper and lower tail prob value
+#----------------------------------------------------------
+getP <- function(z = NULL) {
+  if(is.null(z)){
+    z <- list(rnorm(1), rnorm(1000))}
+    
+  plower <- mean(z[[2]] <= z[[1]]) # calculated the proportion when simulated value is less than or equal to observed value
+  pupper <-  mean(z[[2]] >= z[[1]]) # calculated the prop when sim is greater than or equal to obs
+  
+  
+  
+  return(c(pL = plower, pU = pupper))
+  
+} #end of getP
+#----------------------------------------------------------
+
+#getP()
+
+#----------------------------------------------------------
+#FUNCTION: plotRan  
+#Description: create ggplot of histogram of simulated values  
+#Inputs: liat of observed metric and vector of simulated metrics
+#Outputs: saved ggplot histogram
+#----------------------------------------------------------
+plotRan  <- function(z = NULL) {
+    if(is.null(z)){
+      z<- list(rnorm(1), rnorm(1000))
+    }
+  df <- data.frame(ID = seq_along(z[[2]]), simX = z[[2]])
+  p1 <- ggplot(data = df, mapping = aes(x=simX))+ 
+    geom_histogram(mapping = aes(fill = I("goldenrod"),
+                                 colour = I("black")))+ 
+    geom_vline(aes(xintercept = z[[1]], col = "blue"))
+  print(p1)
+  
+} #end of plotRan 
+#----------------------------------------------------------
+
+#plotRan()
+
+
+###########################################################
+
+nSim <- 1000 # #of data sets to simulate
+xSim <-  rep(NA,nSim)#set up empty vector for simdata
+df <- readDat(z = "GA and KR_paper.csv") #load in data from my MSc
+
+colnames(df) # checking the column names to see what we have
+
+#lets pull out the genotype (GT), Water regiment (WT), Abscisic acid concentrations (ABA) and stomatal conductance (gs)
+
+df <- df[,c("GT","Water", "ABA", "Gs")]
+head(df)
+
+
+xObs <- getMet(df, P1 = 4, P2 = 1) #get mean of data
+print(xObs)
+
+for(i in seq_len(nSim)){ # loop this 1000 times
+  xSim[i] <- getMet(shuffleDat(df, P1 = 4), P1 = 4, P2 = 1) #create a metric for a shuffled data set
+}
+
+pvals <- list(xObs,xSim) # create a list of the two object we created
+
+getP(pvals) # get p values
+plotRan(pvals) #plot histogram
+
+
+```
+
+
+
+## Question 5
+
+
+
+Basically what I did in question 4 was testing how different the p values are for all the simulations. The actual p value and the mean predicted P values are honestly pretty close which I find surprising. There was no difference here in stomatal conductance between genotypes. I originally tried with watering regiment but the significance was way to high to be a reasonable outcome. It resulted in a P upper of 1 because all of the simulated P values were always greater. This was due to the nature of the measurement. Stomatal conductance drops off rapidly under severe drought stress, which these wheat plants were certainly exposed to.
+
+```{r}
+
+# get regular p value from usual analysis
+
+p <- summary(aov(df$Gs~df$GT))[[1]][1,5]
+
+#versus
+
+p2 <- getP(pvals) # predicted p values
+
+
+print(c(p, p2)) # viewing them together
+
+
+
+
+
+
+```
+

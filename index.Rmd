@@ -49,3 +49,16 @@ No Link
 #### *Week 7*   
 [Homework 7 - Distributions and Simulation](Homework-11.html)  
 
+
+#### *Week 8*   
+[Homework 8 - Fake Data Sets](Homework_8.html)  
+
+
+#### *Week 9*   
+[Homework 9 - Structured Programming](HW9.html) 
+
+
+#### *Week 10*   
+[Homework 10 - For Loops and Randomization](Homework10.html)  
+
+

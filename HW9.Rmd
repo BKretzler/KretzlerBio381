@@ -1,0 +1,366 @@
+---
+title: "Homework9"
+author: "Bailey Kretzler"
+date: "4/7/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+Here is the code for the first part of the homework. This section follows my set up in homework 8 almost exactly.
+
+```{r}
+library(ggplot2)
+
+
+
+
+#---------------------------------------------------------#
+#                      Setting up data frame               
+#---------------------------------------------------------#
+
+df1=data.frame(
+	rainfall = rep(c("high","low"), each= 16), #rainfall @origin
+	accession = paste("PI",rep(1:8, each = 4), sep = "_"), #accession number
+	BioRep=rep(1:4,times=8), #biological replicate of genotype
+	rootLen = 0, #root length
+	nodNum = 0, #nodule number
+	wue = 0, #water use efficiency
+  rootAng = 0 #root branching 
+	)
+
+#---------------------------------------------------------#
+#                      FUNCTIONS
+#---------------------------------------------------------#
+
+#----------------------------------------------------------
+#FUNCTION: genDist
+#Description: generate distributions for the data frame
+#Inputs: meanH/L = predicted mean of parameter for high/low rainfall,
+#        sdH/L = standard deviation of parameterfor high/low rainfall,
+#        rows = number of rows to fill  
+#Outputs: a vector of variables for the parameter
+#----------------------------------------------------------
+
+genDist <- function(rows = 16, meanH = 10, sdH = 2.5, meanL = 5, sdL = 1){
+  simVec <- c(rnorm(n = rows, mean = meanH, sd = sdH), rnorm(n = rows, mean = meanL, sd = sdL))
+  
+  return(simVec)
+  
+} #end of genDist
+
+#----------------------------------------------------------
+
+#genDist()
+
+#----------------------------------------------------------
+#FUNCTION: simSum
+#Description: summary for analysis of data  
+#Inputs: dat = dataframe to be used
+#        P1 = parameter 1
+#        P2 = parameter 2
+#        type = type of analysis to do
+#Outputs: p-value
+#----------------------------------------------------------
+simSum <- function(dat = data.frame(P1 = 1:20, P2 = 20:1), 
+                   P1 = 1:20, 
+                   P2 = 20:1,
+                   type = "lm") {
+  if(type == "lm"){
+    sum <- summary(lm(data = dat, P1~P2))
+    p <- sum$coefficients[2,4]
+  }
+  if(type == "aov"){
+    sum <- summary(aov(data = dat, P1~P2))
+    p<- sum[[1]][1,5]
+  }
+  return(p)
+  
+} #end of simSum
+#----------------------------------------------------------
+
+simSum()
+
+
+
+#----------------------------------------------------------
+#FUNCTION: Plotter
+#Description: Plotting data from simulation
+#Inputs: xVar = xvariable to use
+#        yVar = yvariable to use  
+#Outputs: a plot
+#----------------------------------------------------------
+Plotter <- function(dat = data.frame(yVar = 1:20, xVar = 20:1), 
+                   yVar = 1:20, 
+                   xVar = 20:1, 
+                   type = "line") {
+  if(type == "box"){
+  pl <- ggplot2::ggplot(data = dat, aes(x = xVar, y = yVar, group = xVar)) + 
+    geom_boxplot() +
+    theme_bw() #end of plot
+  }
+  if(type == "line"){
+  pl <- ggplot2::ggplot(data = dat, aes(x = xVar, y = yVar)) + 
+    geom_point() + 
+    stat_smooth(method = "lm") + 
+    theme_bw() #end of plot
+  }
+  suppressMessages(print(pl))
+  
+} #end of Plotter
+#----------------------------------------------------------
+
+Plotter()
+
+### End of functions
+###########################################################
+#---------------------------------------------------------#
+#                      filling data frame
+#---------------------------------------------------------#
+
+
+df1$rootLen <- genDist(rows = nrow(df1)/2, meanH = 4000, sdH = 300, meanL = 6000, sdL = 500)
+
+df1$nodNum <- genDist(rows = nrow(df1)/2, meanH = 50, sdH = 10, meanL = 80, sdL = 10)
+
+df1$wue  <- genDist(rows = nrow(df1)/2, meanH = 0.0125, sdH = 0.005, meanL = 0.0375, sdL = 0.005)
+
+df1$rootAng  <- genDist(rows = nrow(df1)/2, meanH = 60, sdH = 5, meanL = 30, sdL = 5)
+
+head(df1)
+
+
+#---------------------------------------------------------#
+#                      analyzing data
+#---------------------------------------------------------#
+
+#vector for storing p values
+pvec <- vector(mode = "integer",length = 6)
+
+
+pvec[1]<- simSum(dat = df1, P1 = df1$rootLen, P2 = df1$rainfall, type = "aov")
+
+pvec[2] <- simSum(dat = df1, P1 = df1$nodNum, P2 = df1$rainfall, type = "aov")
+
+pvec[3] <- simSum(dat = df1, P1 = df1$wue, P2 = df1$rainfall, type = "aov")
+
+pvec[4] <- simSum(dat = df1, P1 = df1$rootAng, P2 = df1$rainfall, type = "aov")
+
+pvec[5] <- simSum(dat = df1, P1 = df1$wue, P2 = df1$rootLen, type = "lm")
+
+pvec[6] <- simSum(dat = df1, P1 = df1$wue, P2 = df1$rootAng, type = "lm")
+
+which(pvec < 0.05) # all significant
+
+
+#---------------------------------------------------------#
+#                      graphing data
+#---------------------------------------------------------#
+
+#vector for storing p values
+pvec <- vector(mode = "integer",length = 6)
+
+
+Plotter(dat = df1, yVar = df1$rootLen, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$nodNum, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$wue, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$rootAng, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$wue, xVar = df1$rootLen, type = "line")
+
+Plotter(dat = df1, yVar = df1$wue, xVar = df1$rootAng, type = "line")
+
+
+
+
+```
+
+
+
+Here is an alternate version of the code. I have adjusted my analysis function to include the r squared from the linear model and a t test for the anova to obtain the means of each group. I also added some annotations to my graphs based on these extracted parameters.
+
+
+```{r}
+#---------------------------------------------------------#
+#                      Setting up data frame               
+#---------------------------------------------------------#
+
+df1=data.frame(
+	rainfall = rep(c("high","low"), each= 16), #rainfall @origin
+	accession = paste("PI",rep(1:8, each = 4), sep = "_"), #accession number
+	BioRep=rep(1:4,times=8), #biological replicate of genotype
+	rootLen = 0, #root length
+	nodNum = 0, #nodule number
+	wue = 0, #water use efficiency
+  rootAng = 0 #root branching 
+	)
+
+#make generic df for the functions
+
+
+
+#---------------------------------------------------------#
+#                      FUNCTIONS
+#---------------------------------------------------------#
+
+#----------------------------------------------------------
+#FUNCTION: genDist
+#Description: generate distributions for the data frame
+#Inputs: meanH/L = predicted mean of parameter for high/low rainfall,
+#        sdH/L = standard deviation of parameter for high/low rainfall,
+#        rows = number of rows to fill  
+#Outputs: a vector of variables for the parameter
+#----------------------------------------------------------
+
+genDist <- function(rows = 16, meanH = 10, sdH = 2.5, meanL = 5, sdL = 1){
+  simVec <- c(rnorm(n = rows, mean = meanH, sd = sdH), rnorm(n = rows, mean = meanL, sd = sdL))
+  
+  return(simVec)
+  
+} #end of genDist
+
+#----------------------------------------------------------
+
+genDist()
+
+#----------------------------------------------------------
+#FUNCTION: simSum
+#Description: summary for analysis of data  
+#Inputs: dat = dataframe to be used
+#        P1 = parameter 1
+#        P2 = parameter 2
+#        type = type of analysis to do
+#Outputs: p-value
+#----------------------------------------------------------
+simSum <- function(dat = data.frame(P1 = 1:20, P2 = 20:1), 
+                   P1 = 1:20, 
+                   P2 = 20:1,
+                   type = "lm") {
+  if(type == "lm"){
+    sum <- summary(lm(data = dat, P1~P2))
+    p <- signif(sum$coefficients[2,4], digits = 3)
+    r <- signif(sum$r.squared, digits = 3)
+    out <- c(p,r)
+  }
+  if(type == "aov"){
+    sum <- summary(aov(data = dat, P1~P2))
+    t <- as.vector(t.test(data = dat, P1~P2)[[5]])
+    m <- signif(t,digits = 3)
+    p <- signif(sum[[1]][1,5], digits = 3)
+    out <- c(p,m)
+    #note to self if you want to use this more universally
+    # use if(length(unique(P2))>2) {then use a tukey test}
+    #otherwise use t test
+  }
+  return(out)
+  
+} #end of simSum
+#----------------------------------------------------------
+print(simSum())
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION: Plotter
+#Description: Plotting data from simulation
+#Inputs: xVar = xvariable to use
+#        yVar = yvariable to use  
+#Outputs: a plot
+#----------------------------------------------------------
+Plotter <- function(dat = data.frame(yVar = 1:20, xVar = 20:1), 
+                   yVar = 1:20, 
+                   xVar = 20:1,  type = "line") {
+  if(type == "box"){
+    sum <- simSum(dat = dat, P1 = yVar, P2 = xVar, type = "aov")
+  pl <- ggplot2::ggplot(data = dat, aes(x = xVar, y = yVar, group = xVar)) + 
+    geom_boxplot() +
+    theme_bw() + 
+    annotate(geom="text", x="high", y=(sum[2] + sum[2]*0.25), 
+             label= paste("Mean =", sum[2]),
+              color="darkgreen")+ 
+    annotate(geom="text", x="low", y=(sum[3] + sum[3]*0.25), 
+             label= paste("Mean =", sum[3]),
+              color="darkgreen")
+  #end of plot
+  }
+  if(type == "line"){
+    sum <- simSum(dat = dat, P1 = yVar, P2 = xVar, type = "lm")
+  pl <- ggplot2::ggplot(data = dat, aes(x = xVar, y = yVar)) + 
+    geom_point() + 
+    stat_smooth(method = "lm") + 
+    theme_bw() + 
+    annotate(geom="text", x=(max(xVar)*0.75), y=(max(yVar) + max(yVar)*0.1), 
+             label= paste("Rsq =", sum[2], "\n p = ", sum[1]),
+              color="darkgreen")#end of plot
+  }
+  suppressMessages(print(pl))
+  
+} #end of Plotter
+#----------------------------------------------------------
+
+Plotter()
+
+### End of functions
+###########################################################
+#---------------------------------------------------------#
+#                      filling data frame
+#---------------------------------------------------------#
+
+
+df1$rootLen <- genDist(rows = nrow(df1)/2, meanH = 4000, sdH = 300, meanL = 6000, sdL = 500)
+
+df1$nodNum <- genDist(rows = nrow(df1)/2, meanH = 50, sdH = 10, meanL = 80, sdL = 10)
+
+df1$wue  <- genDist(rows = nrow(df1)/2, meanH = 0.0125, sdH = 0.005, meanL = 0.0375, sdL = 0.005)
+
+df1$rootAng  <- genDist(rows = nrow(df1)/2, meanH = 60, sdH = 5, meanL = 30, sdL = 5)
+
+head(df1)
+
+
+#---------------------------------------------------------#
+#                      analyzing data
+#---------------------------------------------------------#
+
+simSum(dat = df1, P1 = df1$rootLen, P2 = df1$rainfall, type = "aov")
+
+simSum(dat = df1, P1 = df1$nodNum, P2 = df1$rainfall, type = "aov")
+
+simSum(dat = df1, P1 = df1$wue, P2 = df1$rainfall, type = "aov")
+
+simSum(dat = df1, P1 = df1$rootAng, P2 = df1$rainfall, type = "aov")
+
+simSum(dat = df1, P1 = df1$wue, P2 = df1$rootLen, type = "lm")
+
+simSum(dat = df1, P1 = df1$wue, P2 = df1$rootAng, type = "lm")
+
+
+#---------------------------------------------------------#
+#                      graphing data
+#---------------------------------------------------------#
+
+#vector for storing p values
+pvec <- vector(mode = "integer",length = 6)
+
+
+Plotter(dat = df1, yVar = df1$rootLen, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$nodNum, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$wue, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$rootAng, xVar = df1$rainfall, type = "box")
+
+Plotter(dat = df1, yVar = df1$wue, xVar = df1$rootLen, type = "line")
+
+Plotter(dat = df1, yVar = df1$wue, xVar = df1$rootAng, type = "line")
+
+
+
+
+```
