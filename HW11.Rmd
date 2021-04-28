@@ -1,0 +1,479 @@
+---
+title: "Homework11"
+author: "Bailey Kretzler"
+date: "4/21/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+## Introduction
+
+For this exercise I am going to use some recenty acquired root data. I obtained this from root scans of *Phaseolus vulgaris* using the WinRhizo software to analyze it. The out put was a .txt which I cleaned up in R in a separate file. I am going to mostly focus on root length here. I will use this data to simulate some other data and batch process that. 
+
+
+### Loading in Data
+
+```{r setup, warning=FALSE, message=FALSE}
+#---------------------------------------------------------#
+#                      Prelims
+#---------------------------------------------------------#
+
+library(MASS)
+
+library(ggplot2)
+
+library(TeachingDemos)
+
+char2seed("Flatpicking Solo")
+
+#---------------------------------------------------------#
+#                      global variables
+#---------------------------------------------------------#
+
+file <- "RandomBeans/" # the random file we will use 
+
+nfiles <- 50 # number of files to create from the data
+
+fileOut <- "StatsSummaryBeans.csv" #output file
+
+#---------------------------------------------------------#
+#                      load in data
+#---------------------------------------------------------#
+
+df <- read.table(file = "CleanedWin.csv", sep = ",", header = TRUE)  #root scan data
+
+colnames(df)
+
+#subsetting to the most relevant data
+Roots <- (df[,c("SampleID","GT", "TMT", "rep","Length", "SurfArea", "Tips", "Forks")])
+
+
+#---------------------------------------------------------#
+#                      inspect data
+#---------------------------------------------------------#
+
+
+myHist <- function(xVar,filCol="thistle"){
+  
+  ggplot(data = Roots, aes(x = xVar, y = ..density..)) + geom_histogram( colour = "black", fill = "thistle") + 
+    theme_bw() 
+}
+
+for(i in 5:8){
+  p <-  myHist(Roots[,i]) 
+  print(p)
+}
+
+#surface are and length are best candidates
+
+#create data frame of just these
+
+BeanSub <- Roots[,c("Length","SurfArea")]
+
+
+#---------------------------------------------------------#
+#              Extracting normal parameters                      
+#---------------------------------------------------------#
+
+
+###########################################################
+#------------------SEE CODE AT END-----------------------#
+###########################################################
+
+
+
+#normal distrubtion for root length
+normLen <- fitdistr(Roots$Length,"normal")
+
+#create mean and standard deviation values from fitdistr above
+meanLen <- normLen$estimate["mean"]
+sdLen <- normLen$estimate["sd"]
+
+
+#normal dist for surface area 
+normSA <- fitdistr(Roots$SurfArea,"normal")
+
+#create mean and standard deviation values from fitdistr above
+meanSA <- normSA$estimate["mean"]
+sdSA <- normSA$estimate["sd"]
+
+
+# ---------------------------------------------------------
+#                      Functions                
+# ---------------------------------------------------------
+
+#----------------------------------------------------------
+#FUNCTION: fileBuilder
+#Description: creates a set of randome files for regression
+#Inputs: fileN = number of data files to create, 
+#        fileFold = folder name for random files, 
+#        fileSize = c(min, max) min and max number of rows in file,
+#        fileNA = average number of NA values per column
+#Outputs: creates set of random riles
+#----------------------------------------------------------
+fileBuilder <- function(fileN = 10,
+                        fileFold = "RandomBeans/",
+                        fileSize = c(15, 100),
+                        fileNA = 3) {
+  
+  for(i in seq_len(fileN)){
+    fileLen <- sample(fileSize[1]:fileSize[2], size = 1)
+      #creates a random file length using the rand specified by file size
+      #from value 1 to value 2
+    Length <- rnorm(n = fileLen, mean = meanLen, sd = sdLen) #using parameter extracted above
+    SurfArea <- rnorm(n =fileLen, mean = meanSA, sd = sdSA) #using parameter extracted above
+    df <- data.frame(Length, SurfArea) #bind into data frame
+    badVal <- rpois(n = 1, lambda = fileNA) #determine number of NAs
+    df[sample(nrow(df), size = badVal),1] <- NA
+    df[sample(nrow(df), size = badVal),2] <- NA
+    
+    #create label for file name with padded zeros
+    
+    fileLab <- paste(fileFold, "RanFile",
+                     formatC(i,
+                             width = 3,
+                             format = "d",
+                             flag = "0"),
+                     ".csv", sep ="")
+    # set up data file and incorporate time stamp and minimal metadata
+    
+  write.table(cat("# Simulated random data file for batch processing", "\n",
+                  "# timestamp: ", as.character(Sys.time()), "\n",
+                  "# BMK", "\n",
+                  "# ------------------------------", "\n",
+                  "\n",
+                  file = fileLab,
+                  row.names = "",
+                  col.names = "",
+                  sep = ""))
+  #add data frame
+  
+  write.table(x = df, 
+              file = fileLab,
+              sep = ",",
+              row.names = FALSE,
+              append = TRUE)
+    
+    
+  }#End loop
+
+  
+} #end of fileBuilder
+#----------------------------------------------------------
+
+#----------------------------------------------------------
+#FUNCTION: regStats
+#Description: fit linear mode, extract model stats
+#Inputs: 2 column data fram (x and y)
+#Outputs: slope, p value, and r sq
+#----------------------------------------------------------
+regStats <- function(d = NULL) {
+      if(is.null(d)){
+        x <- runif(10)
+        y <- runif(10)
+        d <- data.frame(x,y)
+      }
+  . <- lm(data = d, d[,2]~d[,1])
+  . <- summary(.)
+  statList <- list(slope <- .$coefficients[2,1], 
+                   p <- .$coefficients[2,4],
+                   rsq <- .$r.squared)
+  
+  
+    
+  
+  return(statList)
+  
+} #end of regStats
+#----------------------------------------------------------
+
+
+#---------------------------------------------------------#
+#               create data frame and sets
+#---------------------------------------------------------#
+
+dir.create(file) # IF CHANGED DON'T RE RUN
+
+write.csv(BeanSub, file = "RandomBeans/BeanSub.csv") #add real data to directory
+
+fileBuilder(fileN = nfiles) #IF CHANGED DON'T RERUN
+
+fileNames <- list.files(path = file)
+
+#data frame
+
+ID <- seq_along(fileNames)
+filename <- fileNames
+slope <- rep(NA, length(fileNames))
+pval <- rep(NA, length(fileNames))
+rsq <- rep(NA, length(fileNames))
+statOut <- data.frame(ID, filename,slope, pval,rsq)
+
+head(statOut)
+
+
+```
+
+
+
+
+
+Now that everything is set up we can get on with batch processing these files!
+
+
+
+
+
+### Batch Proccessing
+
+
+
+
+
+```{r, message=FALSE,warning=FALSE}
+
+#---------------------------------------------------------#
+#                      Batch Processing
+#---------------------------------------------------------#
+
+### loop through the individual filed and process
+
+
+for(i in seq_along(fileNames)){
+  data <- read.table(file = paste(file,fileNames[i],
+                     sep = ""), #sep for paste
+                     sep = ",",#sep for read.table
+                     header = TRUE) 
+  dClean <- data[complete.cases(data),] # subset for clean data (no NAs)
+  
+  . <- regStats(dClean)
+  statOut[i,3:5] <- unlist(.)
+}
+
+
+#set up output file with metadata
+
+write.table(cat("# Summary Stats for ",
+                "batch processing of regression models",
+                "\n",
+                "# time stamp:", as.character(Sys.time()),
+                "\n",
+                file = fileOut,
+                row.names ="",
+                col.names = "",
+                sep = ""))
+
+
+#add data frame
+
+write.table(x = statOut,
+            file = fileOut,
+            row.names = FALSE,
+            col.names = TRUE,
+            sep = ",",
+            append = TRUE)
+
+
+#view the head of the file to see what the model out put looks like
+
+head(statOut)
+
+#most importantly look at the model output for the real data
+
+statOut[which(statOut$filename == "BeanSub.csv"),]
+
+```
+
+Form this it seems like the relationship between root length and surface area is not significant in the real data. However, I came back to this after doing homework 12 where I analyzed this in a one off linear model and the relationship was significant. So there is possibly something wrong with the code here that I am missing. Does this have something to do with the set seed?
+
+
+
+
+
+
+
+### Fitting Distributions
+
+This is the code I used to determine which distributions were the best for simulating the root data. They both ended up being normalish.
+
+
+#### Root length
+
+```{r}
+
+ pl <- myHist(Roots$Length) # initial histogram
+d<- geom_density(linetype="dotted",size=0.75) #add density geom
+pl +  d # print out
+
+ #---------------------------------------------------------#
+ #                      normal
+ #---------------------------------------------------------#
+#use fitdistr to fit normal distribution parameters to data
+normPars <- fitdistr(Roots$Length,"normal")
+
+#pring to view what it generated
+print(normPars)
+#view the structure
+str(normPars)
+#extract the mean
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+
+#create mean and standard deviation values from fitdistr above
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+#creating a vector for x values to use on the graph
+#zero to the max value of phoshorus
+#length is the number of observations
+xval <- seq(0,max(Roots$Length),len=length(Roots$Length))
+
+#add a normal shaped line to the graph in red
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(Roots$Length), args = list(mean = meanML, sd = sdML))
+ pl + stat + d
+
+ #---------------------------------------------------------#
+ #                      Exponential
+ #---------------------------------------------------------#
+ 
+#fitdistr for exponential dis
+expoPars <- fitdistr(Roots$Length,"exponential")
+#extracting the rate from the estimates generated
+#by fitdistr
+rateML <- expoPars$estimate["rate"]
+
+#add an exponential dist. line to the graph in blue
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(Roots$Length), args = list(rate=rateML))
+ pl + stat + stat2 + d
+ 
+#this does not match
+ 
+#---------------------------------------------------------#
+#                      Uniform
+#---------------------------------------------------------#
+
+
+#create uniform probability using data min and max in dark green
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(Roots$Length), args = list(min=min(Roots$Length), max=max(Roots$Length)))
+ pl + stat + stat2 + stat3 + d
+
+
+
+ #---------------------------------------------------------#
+ #                      beta
+ #---------------------------------------------------------#
+ 
+#creating a special graph?
+#x is proportional to max value of x plus 0.1
+pSpecial <- ggplot(data=Roots, aes(x=Length/(max(Length + 0.1)), y=..density..)) +
+  geom_histogram(color="black",fill="thistle",size=0.2) + 
+  theme_bw() +
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+#fitdistr for beta 
+betaPars <- fitdistr(x=Roots$Length/max(Roots$Length + 0.1),start=list(shape1=1,shape2=2),"beta")
+#extract shape1
+shape1ML <- betaPars$estimate["shape1"]
+#extract shape 2
+shape2ML <- betaPars$estimate["shape2"]
+
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(Roots$Length), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+
+```
+
+Okay so none of these really look great.. I could not get the gamma to work because of the nature of the data so I am going to stick with the normal distribution for root length. Now let's do surface area.
+
+
+#### Surface Area
+
+```{r}
+
+ pl <- myHist(Roots$SurfArea) # initial histogram
+d<- geom_density(linetype="dotted",size=0.75) #add density geom
+pl +  d # print out
+
+ #---------------------------------------------------------#
+ #                      normal
+ #---------------------------------------------------------#
+#use fitdistr to fit normal distribution parameters to data
+normPars <- fitdistr(Roots$SurfArea,"normal")
+
+#pring to view what it generated
+print(normPars)
+#view the structure
+str(normPars)
+#extract the mean
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+
+#create mean and standard deviation values from fitdistr above
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+#creating a vector for x values to use on the graph
+#zero to the max value of phoshorus
+#length is the number of observations
+xval <- seq(0,max(Roots$SurfArea),len=length(Roots$SurfArea))
+
+#add a normal shaped line to the graph in red
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(Roots$SurfArea), args = list(mean = meanML, sd = sdML))
+ pl + stat + d
+
+ #---------------------------------------------------------#
+ #                      Exponential
+ #---------------------------------------------------------#
+ 
+#fitdistr for exponential dis
+expoPars <- fitdistr(Roots$SurfArea,"exponential")
+#extracting the rate from the estimates generated
+#by fitdistr
+rateML <- expoPars$estimate["rate"]
+
+#add an exponential dist. line to the graph in blue
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(Roots$SurfArea), args = list(rate=rateML))
+ pl + stat + stat2 + d
+ 
+#this does not match
+ 
+#---------------------------------------------------------#
+#                      Uniform
+#---------------------------------------------------------#
+
+
+#create uniform probability using data min and max in dark green
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(Roots$SurfArea), args = list(min=min(Roots$SurfArea), max=max(Roots$SurfArea)))
+ pl + stat + stat2 + stat3 + d
+
+
+
+ #---------------------------------------------------------#
+ #                      beta
+ #---------------------------------------------------------#
+ 
+#creating a special graph?
+#x is proportional to max value of x plus 0.1
+pSpecial <- ggplot(data=Roots, aes(x=SurfArea/(max(SurfArea + 0.1)), y=..density..)) +
+  geom_histogram(color="black",fill="thistle",size=0.2) + 
+  theme_bw() +
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+#fitdistr for beta 
+betaPars <- fitdistr(x=Roots$SurfArea/max(Roots$SurfArea + 0.1),start=list(shape1=1,shape2=2),"beta")
+#extract shape1
+shape1ML <- betaPars$estimate["shape1"]
+#extract shape 2
+shape2ML <- betaPars$estimate["shape2"]
+
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(Roots$SurfArea), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+
+```
+
+Again the normal is the best option since I cannot figure out the gamma distribution. 

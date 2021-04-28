@@ -36,9 +36,8 @@ fileBuilder <- function(fileN = 10,
                      formatC(i,
                              width = 3,
                              format = "d",
-                             flag = "O"),
-                     ".csv", 
-                     sep ="")
+                             flag = "0"),
+                     ".csv", sep ="")
     # set up data file and incorporate time stamp and minimal metadata
     
   write.table(cat("# Simulated random data file for batch processing", "\n",
@@ -64,3 +63,104 @@ fileBuilder <- function(fileN = 10,
   
 } #end of fileBuilder
 #----------------------------------------------------------
+fileBuilder()
+#----------------------------------------------------------
+#FUNCTION: regStats
+#Description: fit linear mode, extract model stats
+#Inputs: 2 column data fram (x and y)
+#Outputs: slope, p value, and r sq
+#----------------------------------------------------------
+regStats <- function(d = NULL) {
+      if(is.null(d)){
+        x <- runif(10)
+        y <- runif(10)
+        d <- data.frame(x,y)
+      }
+  . <- lm(data = d, d[,2]~d[,1])
+  . <- summary(.)
+  statList <- list(slope <- .$coefficients[2,1], 
+                   p <- .$coefficients[2,4],
+                   rsq <- .$r.squared)
+  
+  
+    
+  
+  return(statList)
+  
+} #end of regStats
+#----------------------------------------------------------
+
+library(TeachingDemos)
+
+char2seed("Flatpicking Solo")
+
+#---------------------------------------------------------#
+#                      global variables
+#---------------------------------------------------------#
+
+file <- "RandomFiles/"
+
+nfiles <- 100
+
+fileOut <- "StatsSummary2.csv"
+
+#---------------------------------------------------------#
+#               create data frame and sets
+#---------------------------------------------------------#
+
+dir.create(file) # IF CHANGED DON'T RE RUN
+
+fileBuilder(fileN = nfiles) #IF CHANGED DON'T RERUN
+
+fileNames <- list.files(path = file)
+
+#data frame
+
+ID <- seq_along(fileNames)
+filename <- fileNames
+slope <- rep(NA, length(fileNames))
+pval <- rep(NA, length(fileNames))
+rsq <- rep(NA, length(fileNames))
+statOut <- data.frame(ID, filename,slope, pval,rsq)
+
+
+#---------------------------------------------------------#
+#                      Batch Processing
+#---------------------------------------------------------#
+
+### loop through the individual filed and process
+
+
+for(i in seq_along(fileNames)){
+  data <- read.table(file = paste(file,fileNames[i],
+                     sep = ""), #sep for paste
+                     sep = ",",#sep for read.table
+                     header = TRUE) 
+  dClean <- data[complete.cases(data),] # subset for clean data (no NAs)
+  
+  . <- regStats(dClean)
+  statOut[i,3:5] <- unlist(.)
+}
+
+
+#set up output file with metadata
+
+write.table(cat("# Summary Stats for ",
+                "batch processing of regression models",
+                "\n",
+                "# time stamp:", as.character(Sys.time()),
+                "\n",
+                file = fileOut,
+                row.names ="",
+                col.names = "",
+                sep = ""))
+
+
+#add data frame
+
+write.table(x = statOut,
+            file = fileOut,
+            row.names = FALSE,
+            col.names = TRUE,
+            sep = ",",
+            append = TRUE)

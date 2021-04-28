@@ -1,0 +1,153 @@
+---
+title: "Homework12"
+author: "Bailey Kretzler"
+date: "4/28/2021"
+output:  
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+
+### Introduction
+
+Today I am going to be making some graphs! I have some bean root data I want to look at so lets make some root length graphs. One thing I want to know is is root length differs between genotype and treatment. For this I'll do a basic anova, tukey test, and then create a box plot. This data set is not complete and will eventually have the total water use of the plants, which I will test for correlation to root length. For now I will use root surface area as a stand in. I will create a linear model to determine if the relationship between these two variables is significant and then generate a scatterplot. 
+
+
+First let's input the preliminaries
+
+```{r}
+
+#---------------------------------------------------------#
+#                      Prelims
+#---------------------------------------------------------#
+
+#load in these packages
+library(MASS) 
+
+library(ggplot2)
+
+library(agricolae)
+#---------------------------------------------------------#
+#                      load in data
+#---------------------------------------------------------#
+
+
+df <- read.table(file = "CleanedWin.csv", sep = ",", header = TRUE)  #root scan data
+
+colnames(df)
+
+#subsetting to the most relevant data
+Roots <- (df[,c("SampleID","GT", "TMT", "rep","Length", "SurfArea", "Tips", "Forks")])
+
+```
+
+
+
+### Boxplot
+
+Now we can do the analysis for the box plot. I'm not using a function because this is pretty simple as is and I only have to do it once.
+
+```{r}
+#---------------------------------------------------------#
+#                      analysis
+#---------------------------------------------------------#
+
+anova(lm(data = df, Length~GT*TMT)) #TMT is not significant let's take it out
+
+anova(lm(data = df, Length~GT))# root lenth differs between genotypes
+
+t1 <- HSD.test(aov(data = Roots, Length~GT), "GT",console = TRUE)[[5]]
+
+
+t1$ID <- rownames(t1)
+
+head(t1)
+
+```
+
+From the anovas we learn that treatment is not impacting root length, nor is the impact of the treatment different between genotypes. However, genotypes do differ  in their total root length. Let's make a graph of that. We will make a boxplot and include the ranks from the tukey test to add letters of significant difference.
+
+
+
+```{r}
+#---------------------------------------------------------#
+#                      graphs
+#---------------------------------------------------------#
+
+
+ggplot() +  geom_boxplot(data = Roots, aes(x = GT, y = Length, fill = GT), colour = "Black") + 
+  theme_bw() + 
+  ggtitle("Root Length Differs Between Genotypes") + 
+  xlab("Genotype") + ylab("Total Root Length (cm)") + 
+  geom_text(data = t1, aes(x = ID, y = 25, label = groups), size = 5) + 
+  theme(axis.text.x = element_text( size = 12),
+        axis.text.y = element_text( size = 12),
+        legend.position = "none",
+        axis.title.x = element_text(size = 15, margin = margin(t = 15, r = 0, b = 10, l = 0)),
+        axis.title.y = element_text(size = 15, margin = margin(t = 0, r = 15, b = 0, l = 10)),
+        plot.title = element_text(size = 20, lineheight = 1.1, hjust = 0.5)) + 
+  scale_fill_viridis_d()
+
+
+
+
+```
+
+Nice! I think it's a pretty good looking graph! Now for the scatter plot.
+
+
+
+
+### Scatter Plot
+
+Let's start again with the data anlaysis. For the scatter plot we need to use a linear model. We should also check if treatment or genotype is impacting this relationship.
+
+```{r}
+
+
+#---------------------------------------------------------#
+#                      analysis
+#---------------------------------------------------------#
+
+summary(lm(data = df, Length~SurfArea)) #relationship is significant
+
+anova(lm(data = df, Length~SurfArea*TMT)) # no significant impact of treatment
+summary(lm(data = df, Length~SurfArea*TMT))
+
+anova(lm(data = df, Length~SurfArea*GT)) # or of genotype, great!
+summary(lm(data = df, Length~SurfArea*GT))
+
+
+
+
+```
+
+
+From the analysis we learn that there is a significan relationship between root length and surface area. This relationship is not impacted by treatment or bean genotype. So let's graph it!
+
+
+```{r}
+#---------------------------------------------------------#
+#                      graphs
+#---------------------------------------------------------#
+
+
+ggplot(data = Roots, aes(x = SurfArea, y = Length, colour = GT)) +  
+  geom_point() +
+  geom_smooth(se= FALSE, method = lm, fullrange = T, colour = "Black")+
+  theme_bw() + 
+  ggtitle("Root Length Differs Between Genotypes") + 
+  xlab("Surface Area (cm2)") + ylab("Total Root Length (cm)") + 
+  labs(colour = "Genotype") + 
+  theme(axis.text.x = element_text( size = 12),
+        axis.text.y = element_text( size = 12),
+        axis.title.x = element_text(size = 15, margin = margin(t = 15, r = 0, b = 10, l = 0)),
+        axis.title.y = element_text(size = 15, margin = margin(t = 0, r = 15, b = 0, l = 10)),
+        plot.title = element_text(size = 20, lineheight = 1.1, hjust = 0.5),
+        legend.title = element_text( face = "bold",size = 12)) + 
+  scale_colour_viridis_d()
+
+
+
+```

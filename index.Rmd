@@ -59,6 +59,14 @@ No Link
 
 
 #### *Week 10*   
-[Homework 10 - For Loops and Randomization](Homework10.html)  
+[Homework 10 - For Loops and Randomization](Homework10.html) 
+
+
+#### *Week 1*   
+[Homework 11 - Batch Processing](HW11.html) 
+
+
+#### *Week 12*   
+[Homework 12 - ggplot](HW12.html) 
 
 
